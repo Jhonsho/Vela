@@ -14,7 +14,7 @@ La clave pública se puede incluir en la página: los permisos de la tabla permi
 
 ## Publicar en GitHub Pages
 
-En el repositorio, abre **Settings → Pages**, selecciona **GitHub Actions** como fuente y guarda. El flujo de trabajo de `.github/workflows/pages.yml` publicará automáticamente la página después de cada push a `main` o `master`. Para el repositorio `Jhonsho/Jhonsho`, la dirección habitual será `https://jhonsho.github.io/`.
+En el repositorio, abre **Settings → Pages**, selecciona **GitHub Actions** como fuente y guarda. El flujo de trabajo de `.github/workflows/pages.yml` publicará automáticamente la página después de cada push a `main` o `master`. Para el repositorio `Jhonsho/Vela`, la dirección habitual será `https://jhonsho.github.io/Vela/`.
 
 ## Privacidad
 
