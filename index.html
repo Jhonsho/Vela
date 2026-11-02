@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17131f">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Enciende una vela virtual, pide un deseo y guárdalo en tu corazón.">
   <title>Un deseo · Vela virtual</title>
   <style>
@@ -77,7 +77,6 @@
     .save-button { display:block; width:100%; padding:12px 16px; color:#fff; font:600 .95rem system-ui,sans-serif; background:#547e98; border:0; border-radius:999px; cursor:pointer; }
     .save-button:disabled { opacity:.55; cursor:wait }
     .status { min-height:1.5em; margin:10px 0 0; color:#426982; text-align:center; font: .84rem/1.5 system-ui,sans-serif }
-    .honeypot { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
     .note { margin:12px 0 0; color:#718797; font: .75rem/1.5 system-ui,sans-serif }
     @keyframes flicker { from { transform:translateX(-50%) rotate(-2deg) scale(.98,1.02) } to { transform:translateX(-50%) rotate(2deg) scale(1.03,.97) } }
     @media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation:none!important; transition:none!important; scroll-behavior:auto!important } }
@@ -111,14 +110,12 @@
     <form class="wish" id="wishForm">
       <label for="name">Tu nombre <span style="color:#8299a8">(opcional)</span></label>
       <input id="name" name="name" maxlength="60" placeholder="¿Cómo te llamas?" autocomplete="name">
-      <label for="wishText">Si quieres, escribe tu deseo y nosotros lo leeremos para él</label>
+      <label for="wishText">Escribe un deseo para Ekyam</label>
       <textarea id="wishText" name="message" maxlength="500" placeholder="Tu deseo para Ekyam…" autocomplete="off" required></textarea>
-      <label class="honeypot" aria-hidden="true" for="website">No rellenes este campo</label>
-      <input class="honeypot" id="website" name="website" tabindex="-1" autocomplete="off">
-      <button class="save-button" id="saveButton" type="submit">Guardar mi deseo</button>
-      <p class="status" id="saveStatus" role="status" aria-live="polite"></p>
+      <button class="save-button" type="submit">Enviar por WhatsApp</button>
+      <p class="status" id="sendStatus" role="status" aria-live="polite"></p>
     </form>
-    <p class="note">Los deseos guardados solo estarán disponibles para la familia desde el panel privado de la base de datos.</p>
+    <p class="note">Se abrirá WhatsApp con tu mensaje preparado. Pulsa «Enviar» allí para que llegue a la familia. Esta página no guarda los deseos.</p>
   </main>
   <script>
     const page = document.getElementById('candlePage');
@@ -130,42 +127,21 @@
       button.setAttribute('aria-label', lit ? 'Apagar la vela' : 'Encender la vela');
       hint.textContent = lit ? 'La luz está encendida · toca para apagarla' : 'Toca la vela para encenderla';
     });
-    // Completa estos valores cuando crees el proyecto de Supabase.
-    const SUPABASE_URL = 'PEGA_AQUI_LA_URL_DE_TU_PROYECTO';
-    const SUPABASE_PUBLISHABLE_KEY = 'PEGA_AQUI_TU_CLAVE_PUBLICA';
-    const isConfigured = SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('PEGA_AQUI') && !SUPABASE_PUBLISHABLE_KEY.includes('PEGA_AQUI');
     const form = document.getElementById('wishForm');
-    const saveButton = document.getElementById('saveButton');
-    const saveStatus = document.getElementById('saveStatus');
-    if (!isConfigured) {
-      saveButton.disabled = true;
-      saveStatus.textContent = 'El buzón se activará cuando se conecte la base de datos.';
-    } else {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-      script.onload = () => {
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-          if (document.getElementById('website').value) return;
-          const message = document.getElementById('wishText').value.trim();
-          const name = document.getElementById('name').value.trim();
-          if (!message) return;
-          saveButton.disabled = true;
-          saveStatus.textContent = 'Guardando tu deseo…';
-          const { error } = await supabase.from('wishes').insert({ display_name: name || null, message });
-          saveButton.disabled = false;
-          if (error) {
-            saveStatus.textContent = 'No se pudo guardar. Inténtalo de nuevo en un momento.';
-          } else {
-            form.reset();
-            saveStatus.textContent = 'Tu deseo ha quedado guardado para Ekyam. Gracias por compartirlo.';
-          }
-        });
-      };
-      script.onerror = () => { saveStatus.textContent = 'No se pudo cargar el servicio de guardado. Inténtalo más tarde.'; };
-      document.head.appendChild(script);
-    }
+    const sendStatus = document.getElementById('sendStatus');
+    const WHATSAPP_NUMBER = '4915901431881';
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const message = document.getElementById('wishText').value.trim();
+      const name = document.getElementById('name').value.trim();
+      if (!message) return;
+      const text = name
+        ? `Hola, soy ${name}. Mi deseo para Ekyam es:\n${message}`
+        : `Mi deseo para Ekyam es:\n${message}`;
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      window.location.assign(whatsappUrl);
+      sendStatus.textContent = 'Abriendo WhatsApp…';
+    });
   </script>
 </body>
 </html>
