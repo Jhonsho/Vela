@@ -7,43 +7,62 @@
   <meta name="description" content="Enciende una vela virtual, pide un deseo y guárdalo en tu corazón.">
   <title>Un deseo · Vela virtual</title>
   <style>
-    :root { color-scheme: dark; --ink:#fff8ef; --muted:#c9bacb; --gold:#ffd796; --pink:#ffb7aa; }
+    :root { color-scheme:light; --ink:#426982; --muted:#708b9b; --gold:#d6a94e; --pink:#ffb7aa; }
     * { box-sizing:border-box }
-    body { margin:0; min-height:100svh; display:grid; place-items:center; padding:24px; color:var(--ink); font-family:ui-serif, Georgia, serif; background:radial-gradient(ellipse at 50% 43%,#443045 0,#241d2c 38%,#14121c 78%); }
-    main { width:min(100%,520px); text-align:center; }
+    body { position:relative; margin:0; min-height:100svh; display:grid; place-items:center; padding:24px; color:var(--ink); font-family:ui-serif, Georgia, serif; background:#fff; }
+    main { position:relative; z-index:1; width:min(100%,520px); text-align:center; }
+    .decor { position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+    .decor span { position:absolute; display:block; line-height:1; user-select:none; }
+    .star { color:#d7aa50; text-shadow:0 1px 0 #f6e8c7; }
+    .heart { color:#6f9fbd; }
+    .decor span:nth-child(1) { top:7%; left:9%; font-size:13px }
+    .decor span:nth-child(2) { top:12%; right:12%; font-size:11px }
+    .decor span:nth-child(3) { top:25%; left:5%; font-size:10px }
+    .decor span:nth-child(4) { top:31%; right:6%; font-size:13px }
+    .decor span:nth-child(5) { top:47%; left:11%; font-size:12px }
+    .decor span:nth-child(6) { top:55%; right:10%; font-size:10px }
+    .decor span:nth-child(7) { top:70%; left:6%; font-size:11px }
+    .decor span:nth-child(8) { top:78%; right:6%; font-size:13px }
+    .decor span:nth-child(9) { bottom:8%; left:18%; font-size:10px }
+    .decor span:nth-child(10) { bottom:7%; right:20%; font-size:11px }
     .eyebrow { margin:0 0 12px; color:var(--gold); font:600 .76rem/1.4 system-ui,sans-serif; letter-spacing:.22em; text-transform:uppercase }
     h1 { margin:0; font-size:clamp(2.25rem,8vw,3.8rem); font-weight:400; letter-spacing:-.04em }
     .intro { margin:12px auto 0; max-width:340px; color:var(--muted); font:1rem/1.65 system-ui,sans-serif }
     .scene { position:relative; height:310px; margin:4px auto 0; display:grid; place-items:center; isolation:isolate; }
-    .glow { position:absolute; width:220px; height:220px; border-radius:50%; background:#ffba6a; filter:blur(70px); opacity:0; transition:opacity .7s ease; z-index:-1 }
-    .lit .glow { opacity:.26 }
+    .glow { position:absolute; width:200px; height:200px; border-radius:50%; background:#f4d78e; filter:blur(62px); opacity:0; transition:opacity .7s ease; z-index:-1 }
+    .lit .glow { opacity:.34 }
     .candle-button { position:relative; width:150px; height:245px; padding:0; border:0; background:transparent; cursor:pointer; -webkit-tap-highlight-color:transparent; }
     .candle-button:focus-visible { outline:2px solid var(--gold); outline-offset:12px; border-radius:40px }
-    .flame { position:absolute; top:8px; left:50%; width:38px; height:61px; transform:translateX(-50%) scale(.2); transform-origin:50% 90%; opacity:0; border-radius:55% 45% 52% 48% / 68% 68% 32% 32%; background:radial-gradient(ellipse at 50% 72%,#fff8cf 0 16%,#ffe795 34%,#ffad53 65%,#ff7259 100%); filter:drop-shadow(0 0 12px #ffbd69) drop-shadow(0 0 26px #ff9a57); transition:opacity .35s,transform .45s cubic-bezier(.2,.8,.2,1.3); }
+    .flame { position:absolute; top:8px; left:50%; width:38px; height:61px; transform:translateX(-50%) scale(.2); transform-origin:50% 90%; opacity:0; border-radius:55% 45% 52% 48% / 68% 68% 32% 32%; background:radial-gradient(ellipse at 50% 72%,#fffdf0 0 16%,#ffe9ad 34%,#edbd68 65%,#cf9552 100%); filter:drop-shadow(0 0 12px #e5c77e) drop-shadow(0 0 26px #e5c77e); transition:opacity .35s,transform .45s cubic-bezier(.2,.8,.2,1.3); }
     .lit .flame { opacity:1; transform:translateX(-50%) scale(1); animation:flicker 1.7s ease-in-out infinite alternate; }
-    .flame:after { content:""; position:absolute; inset:12px 11px 12px; border-radius:inherit; background:#fff8d5; filter:blur(3px); }
-    .wick { position:absolute; z-index:2; top:65px; left:50%; width:3px; height:18px; transform:translateX(-50%); border-radius:3px; background:#493338; }
-    .wax { position:absolute; top:79px; left:50%; width:106px; height:145px; transform:translateX(-50%); border-radius:13px 13px 10px 10px / 8px 8px 12px 12px; background:linear-gradient(90deg,#c88779,#f3c1a2 24%,#ffdfbd 53%,#e5ad92 82%,#bd796e); box-shadow:inset 7px 0 12px #fff3d330,inset -8px 0 12px #6b38462b,0 16px 30px #09081266; }
-    .wax:before { content:""; position:absolute; top:-5px; left:0; width:100%; height:15px; border-radius:50%; background:linear-gradient(90deg,#d79d88,#ffe1bd 45%,#d39a82); }
-    .drip { position:absolute; top:79px; left:calc(50% + 21px); width:13px; height:34px; border-radius:0 0 9px 9px; background:#f4c4a5; box-shadow:inset -3px 0 4px #b9786b55; }
-    .base { position:absolute; top:216px; left:50%; width:142px; height:18px; transform:translateX(-50%); border-radius:50%; background:radial-gradient(ellipse,#e9b794 0 50%,#b77c70 72%,transparent 74%); opacity:.68 }
-    .tap-hint { position:absolute; top:250px; left:0; width:100%; color:#e4d5d9; font: .82rem system-ui,sans-serif; opacity:.82 }
+    .flame:after { content:""; position:absolute; inset:12px 11px 12px; border-radius:inherit; background:#fffdf0; filter:blur(3px); }
+    .wick { position:absolute; z-index:2; top:65px; left:50%; width:3px; height:18px; transform:translateX(-50%); border-radius:3px; background:#775c49; }
+    .wax { position:absolute; top:79px; left:50%; width:106px; height:145px; transform:translateX(-50%); border:1px solid #d7c8a9; border-radius:13px 13px 10px 10px / 8px 8px 12px 12px; background:linear-gradient(90deg,#f1eadc,#fffdf7 30%,#fff 55%,#f1e9d8 100%); box-shadow:inset 7px 0 12px #fff,inset -8px 0 12px #b9a77d1f,0 16px 30px #526e7a18; }
+    .wax:before { content:""; position:absolute; top:-5px; left:0; width:100%; height:15px; border:1px solid #d7c8a9; border-radius:50%; background:linear-gradient(90deg,#f1eadc,#fffdf7 45%,#eee5d1); }
+    .drip { position:absolute; top:79px; left:calc(50% + 21px); width:13px; height:34px; border-radius:0 0 9px 9px; background:#f5eddf; box-shadow:inset -3px 0 4px #ad956c20; }
+    .base { position:absolute; top:216px; left:50%; width:142px; height:18px; transform:translateX(-50%); border-radius:50%; background:radial-gradient(ellipse,#e7d8bd 0 50%,#d0bb96 72%,transparent 74%); opacity:.62 }
+    .tap-hint { position:absolute; top:250px; left:0; width:100%; color:#648198; font: .82rem system-ui,sans-serif; opacity:.9 }
     .wish { width:min(100%,360px); margin:auto; text-align:left; }
-    .wish label { display:block; margin:0 0 7px; color:#f2d4c0; font: .92rem system-ui,sans-serif }
-    input,textarea { display:block; width:100%; margin:0 0 14px; padding:13px 15px; color:var(--ink); font: .95rem/1.5 system-ui,sans-serif; background:#ffffff0b; border:1px solid #ffffff24; border-radius:14px; outline:none; }
+    .wish label { display:block; margin:0 0 7px; color:#426982; font: .92rem system-ui,sans-serif }
+    input,textarea { display:block; width:100%; margin:0 0 14px; padding:13px 15px; color:#355a73; font: .95rem/1.5 system-ui,sans-serif; background:#fff; border:1px solid #b9cbd5; border-radius:14px; outline:none; }
     textarea { min-height:84px; resize:vertical; }
     input:focus,textarea:focus { border-color:#ffd79699 }
-    input::placeholder,textarea::placeholder { color:#b9aaba }
-    .save-button { display:block; width:100%; padding:12px 16px; color:#2d1d27; font:600 .95rem system-ui,sans-serif; background:linear-gradient(135deg,#ffe2b3,#eeb69d); border:0; border-radius:999px; cursor:pointer; }
+    input::placeholder,textarea::placeholder { color:#8299a8 }
+    .save-button { display:block; width:100%; padding:12px 16px; color:#fff; font:600 .95rem system-ui,sans-serif; background:#547e98; border:0; border-radius:999px; cursor:pointer; }
     .save-button:disabled { opacity:.55; cursor:wait }
-    .status { min-height:1.5em; margin:10px 0 0; color:#f2d4c0; text-align:center; font: .84rem/1.5 system-ui,sans-serif }
+    .status { min-height:1.5em; margin:10px 0 0; color:#426982; text-align:center; font: .84rem/1.5 system-ui,sans-serif }
     .honeypot { position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important; overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important; }
-    .note { margin:12px 0 0; color:#a99cac; font: .75rem/1.5 system-ui,sans-serif }
+    .note { margin:12px 0 0; color:#718797; font: .75rem/1.5 system-ui,sans-serif }
     @keyframes flicker { from { transform:translateX(-50%) rotate(-2deg) scale(.98,1.02) } to { transform:translateX(-50%) rotate(2deg) scale(1.03,.97) } }
     @media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation:none!important; transition:none!important; scroll-behavior:auto!important } }
   </style>
 </head>
 <body>
+  <div class="decor" aria-hidden="true">
+    <span class="star">✦</span><span class="heart">♥</span><span class="heart">♥</span><span class="star">✦</span>
+    <span class="star">✦</span><span class="heart">♥</span><span class="heart">♥</span><span class="star">✦</span>
+    <span class="star">✦</span><span class="heart">♥</span>
+  </div>
   <main id="candlePage">
     <p class="eyebrow">Hoy llega a este mundo nuestro pequeño</p>
     <h1>EKYAM</h1>
@@ -57,7 +76,7 @@
       </button>
     </section>
     <form class="wish" id="wishForm">
-      <label for="name">Tu nombre <span style="color:#a99cac">(opcional)</span></label>
+      <label for="name">Tu nombre <span style="color:#8299a8">(opcional)</span></label>
       <input id="name" name="name" maxlength="60" placeholder="¿Cómo te llamas?" autocomplete="name">
       <label for="wishText">Si quieres, escribe tu deseo y nosotros lo leeremos para él</label>
       <textarea id="wishText" name="message" maxlength="500" placeholder="Tu deseo para Ekyam…" autocomplete="off" required></textarea>
